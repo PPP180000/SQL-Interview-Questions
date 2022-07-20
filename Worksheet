@@ -37,7 +37,7 @@ Q & A :
 
 a.Why are there duplicates in the output? Provide a basic explanation for this behavior.
 
- The reason for the duplicate values in a database can be due to various reasons such as there are multiple entries in the inventory tables, 
+ The reason for the duplicate values in a database can be due to various multiple entries in the inventory tables, 
  multiple operations performed on the datasets, migration issues. But, here it’s because of not mentioning distinct before the title. 
  And it also depends on tables.
 
