@@ -1,4 +1,4 @@
-# SQL-Interview-Quetions
+# SQL-Interview-Questions
 
 
 Exercises in Data Extraction and Presentation
