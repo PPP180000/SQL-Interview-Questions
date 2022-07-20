@@ -1,0 +1,242 @@
+
+
+Begin:
+1)	Consider the following query:
+select
+	film.title
+	,i.store_id
+    
+from
+sakila.film film
+join sakila.inventory i on film.film_id = i.film_id
+
+where
+	store_ID = 1
+	The output looks something like this:
+title	store_id
+
+
+ACADEMY DINOSAUR	1
+ACADEMY DINOSAUR	1
+ACADEMY DINOSAUR	1
+ACADEMY DINOSAUR	1
+AFFAIR PREJUDICE	1
+AFFAIR PREJUDICE	1
+AFFAIR PREJUDICE	1
+AFFAIR PREJUDICE	1
+AGENT TRUMAN	1
+AGENT TRUMAN	1
+AGENT TRUMAN	1
+	
+
+
+
+
+
+Q & A :
+
+a.Why are there duplicates in the output? Provide a basic explanation for this behavior.
+
+ The reason for the duplicate values in a database can be due to various reasons such as there are multiple entries in the inventory tables, 
+ multiple operations performed on the datasets, migration issues. But, here it’s because of not mentioning distinct before the title. 
+ And it also depends on tables.
+
+A 1
+A 1
+G 2
+D 4
+D 4
+S 6
+
+
+b. There are a couple different ways to fix this. Demonstrate at least one solution via SQL
+
+We can avoid it using many techniques such as Partition by, group by depends on the operation type. Here we are using 
+Distinct to see unique values in title.
+
+select
+distinct film.title
+,i.store_id
+from
+sakila.film film
+join sakila.inventory i on film.film_id = i.film_id
+where
+store_ID = 1;
+
+ 
+2)	Provide code that shows the number of rental transactions for both combined rental store locations on a per-month basis.  
+Here is an excerpt of the expected output:
+
+
+
+SELECT film.title, rental.date, count(rental.transaction) as total_trans
+From film
+JOIN rental as r ON r.id = film.id
+GROUP BY film.location, month(r.date) as month
+ORDER BY r.date, total_trans DESC;
+
+
+
+
+RentalMonth	FilmTitle	RentalCount
+2005-05	BUCKET BROTHERHOOD	5
+2005-05	IDOLS SNATCHERS	5
+2005-05	ROBBERS JOON	5
+2005-05	BOOGIE AMELIE	4
+2005-05	CLOSER BANG	4
+2005-05	ENEMY ODDS	4
+2005-05	ENGLISH BULWORTH	4
+2005-05	FANTASY TROOPERS	4
+2005-05	FATAL HAUNTED	4
+2005-05	FEUD FROGMEN	4
+2005-05	FORWARD TEMPLE	4
+2005-05	GRAFFITI LOVE	4
+2005-05	GRIT CLOCKWORK	4
+
+Note the sorting orders (starting with the month) and replicate accordingly.
+
+ 
+
+3)	 Other than Steven Seagal, Penelope Guiness is widely considered to be one of the greatest actors of all time.  
+Some people want to know about Ms. Guiness’ movie catalog.  Provide a list of all her movies, and be sure to include her co-stars 
+in each of those movies.  A discrete temporary table is *not* permitted for this exercise.
+
+Sample output to follow, and note the ordering:
+title	first_name	last_name
+ACADEMY DINOSAUR	JOHNNY	CAGE
+ACADEMY DINOSAUR	ROCK	DUKAKIS
+ACADEMY DINOSAUR	CHRISTIAN	GABLE
+ACADEMY DINOSAUR	PENELOPE	GUINESS
+ACADEMY DINOSAUR	MARY	KEITEL
+ACADEMY DINOSAUR	OPRAH	KILMER
+ACADEMY DINOSAUR	WARREN	NOLTE
+ACADEMY DINOSAUR	SANDRA	PECK
+ACADEMY DINOSAUR	MENA	TEMPLE
+ACADEMY DINOSAUR	LUCILLE	TRACY
+ANACONDA CONFESSIONS	JENNIFER	DAVIS
+ANACONDA CONFESSIONS	PENELOPE	GUINESS
+ANACONDA CONFESSIONS	ELVIS	MARX
+ANACONDA CONFESSIONS	JAYNE	NOLTE
+ANACONDA CONFESSIONS	HUMPHREY	WILLIS
+ANGELS LIFE	RENEE	BALL
+ANGELS LIFE	JULIA	BARRYMORE
+ANGELS LIFE	CHRISTOPHER	BERRY
+ANGELS LIFE	LAURENCE	BULLOCK
+ANGELS LIFE	JENNIFER	DAVIS
+ANGELS LIFE	NICK	DEGENERES
+ANGELS LIFE	PENELOPE	GUINESS
+ANGELS LIFE	ED	MANSFIELD
+ANGELS LIFE	GRACE	MOSTEL
+
+ 
+ 
+Answer 3:
+SELECT * FROM table WHERE title = (SELECT title
+FROM table
+WHERE firstname = ‘PENELOPE’ and lastname = ‘GUINESS’);
+
+
+
+4)	The two video rental stores in the database can’t possibly have all movies ever made.  Using the Sakila database, provide a list of movies that are carried by *neither* store.  In other words, you can’t find the movie.  Sort the list by movie category, then movie title:
+CategoryName	Title
+Action	DARN FORRESTER
+Action	DRAGON SQUAD
+Action	FANTASY TROOPERS
+Action	LUST LOCK
+Action	MOCKINGBIRD HOLLYWOOD
+Action	RINGS HEARTBREAKERS
+Action	STAGECOACH ARMAGEDDON
+Animation	ANACONDA CONFESSIONS
+Animation	CROSSROADS CASUALTIES
+Animation	FORRESTER COMANCHEROS
+Animation	HORN WORKING
+Animation	JUGGLER HARDLY
+Animation	TELEMARK HEARTBREAKERS
+Animation	TRACY CIDER
+Children	INVASION CYCLONE
+Children	LANGUAGE COWBOY
+
+ 
+ 
+ Answer 4 
+ 
+With t1_store as(SELECT * FROM table where store_id = 1)
+With t2_store as(SELECT * FROM table where store_id = 2)
+
+SELECT category, title FROM table 
+WHERE title not in (t1_store, t2_store)
+ORDER BY category, title ASC;
+
+
+
+
+
+5)	Related to question 4 (above), indicate the number of films within a given category that cannot be found at the two stores, and note the ordering:
+CategoryName	 FilmCount
+Foreign	6
+Documentary	5
+Travel	4
+Action	3
+Classics	3
+New	3
+Games	3
+Horror	3
+Animation	2
+Comedy	2
+Sci-Fi	2
+Family	2
+Children	2
+Drama	1
+Sports	1
+
+
+Answer 5
+
+SELECT category, count(title) as count1 FROM table 
+WHERE title not in (t1_store, t2_store)
+GROUP BY category
+ORDER BY count1 DESC;
+
+
+
+
+
+6)	It appears that Store #1 has 168 distinct rental records which starred movie actress Penelope Guiness.  Sorting by Rental _ID, provide a list of those movies and then indicate how many minutes elapsed until the next movie was rented.  We’re interested in *hours* elapsed between subsequent rentals of any film with this actress.
+a.	More points are awarded for getting this list in the correct order, even if the formatting of the hours elapsed is lacking
+b.	Bonus points are awarded for properly formatting the hours elapsed
+
+Rental_ID	FilmTitle	Rental_Date	SubsequentRentalDate	TimeElapsed
+13	KING EVOLUTION	5/25/2005 0:22	5/25/2005 7:19	6.9392
+53	ELEPHANT TROJAN	5/25/2005 7:19	5/26/2005 12:40	29.3519
+240	RULES HUMAN	5/26/2005 12:40	5/26/2005 18:56	6.2675
+282	WIZARD COLDBLOODED	5/26/2005 18:56	5/28/2005 8:53	37.9433
+560	CHEAPER CLYDE	5/28/2005 8:53	5/28/2005 17:24	8.5303
+630	ELEPHANT TROJAN	5/28/2005 17:24	5/28/2005 20:12	2.7914
+653	ANGELS LIFE	5/28/2005 20:12	5/28/2005 22:27	2.2586
+676	LADY STAGE	5/28/2005 22:27	5/30/2005 9:40	35.2136
+901	COLOR PHILADELPHIA	5/30/2005 9:40	5/30/2005 20:21	10.6742
+972	ACADEMY DINOSAUR	5/30/2005 20:21	5/31/2005 5:23	9.0444
+1038	ELEPHANT TROJAN	5/31/2005 5:23	6/15/2005 14:05	368.6958
+1364	ANACONDA CONFESSIONS	6/15/2005 14:05	6/15/2005 14:31	0.4258
+1370	CHEAPER CLYDE	6/15/2005 14:31	6/15/2005 14:38	0.1194
+1371	COLOR PHILADELPHIA	6/15/2005 14:38	6/15/2005 23:57	9.3181
+1520	RULES HUMAN	6/15/2005 23:57	6/16/2005 5:14	5.2881
+1592	SPLASH GUMP	6/16/2005 5:14	6/16/2005 7:48	2.5703
+1623	WIZARD COLDBLOODED	6/16/2005 7:48	6/16/2005 9:10	1.3544
+1645	WESTWARD SEABISCUIT	6/16/2005 9:10	6/16/2005 9:34	0.4108
+1653	KING EVOLUTION	6/16/2005 9:34	6/16/2005 12:40	3.0953
+1695	WESTWARD SEABISCUIT	6/16/2005 12:40	6/16/2005 15:19	2.645
+1726	ANACONDA CONFESSIONS	6/16/2005 15:19	6/16/2005 20:04	4.7611
+1792	SPLASH GUMP	6/16/2005 20:04	6/16/2005 20:16	0.1903
+
+
+
+Answer 6
+
+With t1 as 
+
+(SELECT rental_id, title, rental_date, 
+LAG(MAX(rental_date),1) 
+OVER(PARTITION BY title ORDER BY rental_date DESC) As Subsequent_date, DATEDIFF(hour, Subsequent_date, rental_date) AS Timeelapsed
+FROM table
+GROUP BY film_title);
